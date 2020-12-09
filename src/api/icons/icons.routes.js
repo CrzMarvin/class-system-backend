@@ -1,25 +1,38 @@
 const express = require('express');
 
-const queries = require('./icons.queries');
+// const queries = require('./users.queries');
+const Icon = require('./icons.model');
 
 const router = express.Router();
 
+const addURL = (icon) => ({
+  ...icon,
+  url: icon.url(),
+});
+
 router.get('/', async (req, res) => {
-  const icons = await queries.find();
-  res.json(icons);
+  const icons = await Icon
+    .query()
+    .select('id', 'name', 'type', 'base_url', 'resource')
+    .where('deleted_at', null);
+  const iconsWithUrl = icons.map(addURL);
+  res.json(iconsWithUrl);
 });
 
 router.get('/:id', async (req, res, next) => {
-  const { id } = req.params;
   try {
-    // TODO: should we validate the ID?
-    const icon = await queries.get(parseInt(id, 10) || 0);
-    if (icon) {
-      return res.json(icon);
-    }
-    return next();
+    const icon = await Icon.query()
+      .where('deleted_at', null)
+      .select('id', 'name', 'type', 'base_url', 'resource')
+      .andWhere('id', req.params.id)
+      // .withGraphJoined('item_infos') // TODO: make this work
+      .first();
+    // items.item_infos = items.item_infos.map(
+    //   e => ({ id: e.id, "user_id": e.user_id })
+    // );
+    res.json(addURL(icon));
   } catch (error) {
-    return next(error);
+    next(error);
   }
 });
 

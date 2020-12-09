@@ -1,15 +1,15 @@
 const db = require('../db');
 const tableName = require('../../constants/tableNames');
 
-const field = ['id', 'name', 'type', 'base_url', 'resource'];
+const field = ['id', 'name', 'location'];
 
 module.exports = {
   find() {
     //  TODO: real query needed
-    return db(tableName.icons).select(field);
+    return db(tableName.audience).select(field);
   },
   get(id) {
-    return db(tableName.icons)
+    return db(tableName.audience)
       .select(field)
       .where({
         id,
