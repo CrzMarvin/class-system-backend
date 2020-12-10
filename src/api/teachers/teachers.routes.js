@@ -63,6 +63,10 @@ router.get('/:id', async (req, res, next) => {
       ])
       // .withGraphJoined('item_infos') // TODO: make this work
       .first();
+    if (!teacher) {
+      res.status(404);
+      throw new Error('no content');
+    }
     res.json(teacher);
   } catch (error) {
     next(error);
@@ -96,11 +100,18 @@ router.patch('/:id', async (req, res, next) => {
         throw new Error('invalid icon id');
       }
     }
-    const item = await Teacher.query().patchAndFetchById(
+    const teacher = await Teacher.query().patchAndFetchById(
       req.params.id,
-      req.body,
+      {
+        ...req.body,
+        updated_at: new Date().toISOString(),
+      },
     );
-    res.json(item);
+    if (!teacher) {
+      res.status(404);
+      throw new Error('no content');
+    }
+    res.json(teacher);
   } catch (error) {
     next(error);
   }
@@ -108,9 +119,13 @@ router.patch('/:id', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   try {
-    const { id } = req.params;
     const teacher = await Teacher.query()
-      .deleteById(id);
+      .patchAndFetchById(
+        req.params.id,
+        {
+          deleted_at: new Date().toISOString(),
+        },
+      );
     res.json(teacher);
   } catch (error) {
     next(error);

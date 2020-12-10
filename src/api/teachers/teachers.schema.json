@@ -6,7 +6,7 @@
     "required": [
         "name"
     ],
-    "additionalProperties": false,
+    "additionalProperties": true,
     "properties": {
         "id": {
             "$id": "#/properties/id",
