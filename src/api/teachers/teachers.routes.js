@@ -4,6 +4,7 @@ const { ref, raw } = require('objection');
 // const queries = require('./users.queries');
 const Teacher = require('./teachers.model');
 const Icon = require('../icons/icons.model');
+const { checkId } = require('../../lib/queryUtils');
 
 const router = express.Router();
 
@@ -46,6 +47,7 @@ router.get('/', async (req, res) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
+    checkId(req.params.id, res);
     const teacher = await Teacher.query()
       .where('deleted_at', null)
       .andWhere('id', req.params.id)
@@ -92,6 +94,7 @@ router.post('/', async (req, res, next) => {
 
 router.patch('/:id', async (req, res, next) => {
   try {
+    checkId(req.params.id, res);
     const { icon_id } = req.body;
     if (icon_id !== undefined) {
       const icon = await Icon.query().findById(icon_id);
@@ -119,6 +122,7 @@ router.patch('/:id', async (req, res, next) => {
 
 router.delete('/:id', async (req, res, next) => {
   try {
+    checkId(req.params.id, res);
     const teacher = await Teacher.query()
       .patchAndFetchById(
         req.params.id,
