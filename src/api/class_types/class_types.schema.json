@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "Class Type",
+    "description": "The Class Type",
+    "required": [
+        "name",
+        "audience_id",
+        "color",
+        "duration"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "id": {
+            "$id": "#/properties/id",
+            "type": "integer",
+            "title": "The database ID of the classType."
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "title": "The name of classType."
+        },
+        "color": {
+            "$id": "#/properties/color",
+            "type": "string",
+            "title": "The color of classType."
+        },
+        "duration": {
+            "$id": "#/properties/duration",
+            "type": "integer",
+            "title": "The duration of class."
+        },
+        "audience_id": {
+            "$id": "#/properties/audience_id",
+            "type": "number",
+            "title": "The id of the audiecne."
+        }
+    }
+}

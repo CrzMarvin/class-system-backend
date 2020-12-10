@@ -37,15 +37,22 @@ exports.seed = async (knex) => {
   if (process.env.NODE_ENV !== 'test') {
     console.log('User created:', { password }, createdUser);
   }
-  const audience = {
+  const audience1 = {
     name: '园区',
     location: '工业园区观枫街1号,文博广场B06-天天打击乐',
   };
-  const [createdAud] = await knex(tableNames.audience)
-    .insert(audience)
+  const audience2 = {
+    name: '吴中区',
+    location: '吴中区丽丰商业广场,三楼-天天打击乐',
+  };
+  const [createdAud1] = await knex(tableNames.audience)
+    .insert(audience1)
     .returning('*');
-  console.log('createdAud', createdAud);
-  const { id: audience_id } = createdAud;
+  await knex(tableNames.audience)
+    .insert(audience2)
+    .returning('*');
+  console.log('createdAud', [createdAud1]);
+  const { id: audience_id } = createdAud1;
   await knex(tableNames.icon)
     .insert(icons, '*');
   classrooms.forEach((classroom) => {
