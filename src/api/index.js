@@ -8,6 +8,7 @@ const classrooms = require('./classrooms/classrooms.routes');
 // const class_type = require('./class_type/class_type.routes');
 // const classes = require('./classes/classes.routes');
 const project = require('../constants/project');
+const { authenticateJWT } = require('../lib/jwt');
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.use('/audience', audience);
 router.use('/auth', auth);
 router.use('/users', users);
 router.use('/teachers', teachers);
-router.use('/classrooms', classrooms);
+router.use('/classrooms', authenticateJWT, classrooms);
 // router.use('/class_type', class_type);
 // router.use('/classes', classes);
 
