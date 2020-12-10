@@ -98,5 +98,38 @@ router.post('/signin', async (req, res, next) => {
     next(error);
   }
 });
+// for refresh
+// app.post('/token', (req, res) => {
+//   const { token } = req.body;
+
+//   if (!token) {
+//       return res.sendStatus(401);
+//   }
+
+//   if (!refreshTokens.includes(token)) {
+//       return res.sendStatus(403);
+//   }
+
+//   jwt.verify(token, refreshTokenSecret, (err, user) => {
+//       if (err) {
+//           return res.sendStatus(403);
+//       }
+
+// eslint-disable-next-line max-len
+//       const accessToken = jwt.sign({ username: user.username, role: user.role }, accessTokenSecret, { expiresIn: '20m' });
+
+//       res.json({
+//           accessToken
+//       });
+//   });
+// });
+
+// for logout
+// app.post('/logout', (req, res) => {
+//   const { token } = req.body;
+//   refreshTokens = refreshTokens.filter(token => t !== token);
+
+//   res.send("Logout successful");
+// });
 
 module.exports = router;

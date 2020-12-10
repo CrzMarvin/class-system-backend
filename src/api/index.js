@@ -23,6 +23,7 @@ router.use('/audience', audience);
 router.use('/auth', auth);
 router.use('/users', users);
 router.use('/teachers', teachers);
+// router.use('/classrooms', classrooms);
 router.use('/classrooms', authenticateJWT, classrooms);
 // router.use('/class_type', class_type);
 // router.use('/classes', classes);
