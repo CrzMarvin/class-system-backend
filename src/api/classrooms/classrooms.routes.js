@@ -1,9 +1,10 @@
 const express = require('express');
-const { ref, raw } = require('objection');
+const { raw } = require('objection');
 
 // const queries = require('./users.queries');
-const Teacher = require('./teachers.model');
+const Classroom = require('./classrooms.model');
 const Icon = require('../icons/icons.model');
+const Audience = require('../audience/audience.model');
 const { checkIdIsNumber } = require('../../lib/queryUtils');
 
 const router = express.Router();
@@ -11,14 +12,14 @@ const router = express.Router();
 // const subQ = Icon.select('base_url', 'resource');
 
 // router.get('/', async (req, res) => {
-//   const teachers = await Teacher
+//   const classrooms = await Classroom
 //     .query()
 //     .where('deleted_at', null)
 //     .select([
-//       'teacher.id',
-//       'teacher.name',
-//       'teacher.icon_id',
-//       'teacher.star',
+//       'classroom.id',
+//       'classroom.name',
+//       'classroom.icon_id',
+//       'classroom.star',
 //       Icon.query()
 //         .where('icon_id', ref('icon.id'))
 //         .select(raw('concat(base_url, resource)').as('url'))
@@ -26,67 +27,58 @@ const router = express.Router();
 //         .as('petCount'),
 //     ]);
 //     // .withGraphFetched('icon_info').select(1);
-//   res.json(teachers);
+//   res.json(classrooms);
 // });
 router.get('/', async (req, res) => {
-  const teachers = await Teacher
+  const classrooms = await Classroom
     .query()
-    .where('teacher.deleted_at', null)
-    .leftJoin('icon', 'teacher.icon_id', 'icon.id')
-    .orderBy('teacher.id')
+    .where('classroom.deleted_at', null)
+    .leftJoin('icon', 'classroom.icon_id', 'icon.id')
+    .leftJoin('audience', 'classroom.audience_id', 'audience.id')
+    .orderBy('classroom.id')
     .select(
-      'teacher.id',
-      'teacher.name',
-      'gender',
+      'classroom.id',
+      'classroom.name',
       'icon_id',
-      'star',
-      raw('concat(base_url, resource)').as('url'),
+      'audience_id',
+      raw('concat(base_url, resource)').as('icon_url'),
+      raw('audience.name').as('audience_name'),
     );
-  res.json(teachers);
+  res.json(classrooms);
 });
 
 router.get('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const teacher = await Teacher.query()
-      .where('deleted_at', null)
-      .andWhere('id', req.params.id)
-      .select([
-        'teacher.id',
-        'teacher.name',
-        'teacher.gender',
-        'teacher.icon_id',
-        'teacher.star',
-        Icon.query()
-          .where('icon_id', ref('icon.id'))
-          .select(raw('concat(base_url, resource)').as('url'))
-          .first()
-          .as('url'),
-      ])
-      // .withGraphJoined('item_infos') // TODO: make this work
+    const classroom = await Classroom.query()
+      .where('classroom.deleted_at', null)
+      .andWhere('classroom.id', req.params.id)
+      .leftJoin('icon', 'classroom.icon_id', 'icon.id')
+      .leftJoin('audience', 'classroom.audience_id', 'audience.id')
+      .select(
+        'classroom.id',
+        'classroom.name',
+        'icon_id',
+        'audience_id',
+        raw('concat(base_url, resource)').as('icon_url'),
+        raw('audience.name').as('audience_name'),
+      )
       .first();
-    if (!teacher) {
+    if (!classroom) {
       res.status(404);
       throw new Error('no content');
     }
-    res.json(teacher);
+    res.json(classroom);
   } catch (error) {
     next(error);
   }
 });
 router.post('/', async (req, res, next) => {
   try {
-    [
-      'gender',
-    ].forEach((prop) => {
-      if (req.body[prop]) {
-        req.body[prop] = req.body[prop].toString().toUpperCase().trim();
-      }
-    });
-    const address = await Teacher
+    const classroom = await Classroom
       .query()
       .insert(req.body);
-    res.json(address);
+    res.json(classroom);
   } catch (error) {
     next(error);
   }
@@ -95,7 +87,7 @@ router.post('/', async (req, res, next) => {
 router.patch('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const { icon_id } = req.body;
+    const { icon_id, audience_id } = req.body;
     if (icon_id !== undefined) {
       const icon = await Icon.query().findById(icon_id);
       if (!icon) {
@@ -103,18 +95,25 @@ router.patch('/:id', async (req, res, next) => {
         throw new Error('invalid icon id');
       }
     }
-    const teacher = await Teacher.query().patchAndFetchById(
+    if (audience_id !== undefined) {
+      const audience = await Audience.query().findById(audience_id);
+      if (!audience) {
+        res.status(400);
+        throw new Error('invalid audience id');
+      }
+    }
+    const classroom = await Classroom.query().patchAndFetchById(
       req.params.id,
       {
         ...req.body,
         updated_at: new Date().toISOString(),
       },
     );
-    if (!teacher) {
+    if (!classroom) {
       res.status(404);
       throw new Error('no content');
     }
-    res.json(teacher);
+    res.json(classroom);
   } catch (error) {
     next(error);
   }
@@ -123,14 +122,14 @@ router.patch('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const teacher = await Teacher.query()
+    const classroom = await Classroom.query()
       .patchAndFetchById(
         req.params.id,
         {
           deleted_at: new Date().toISOString(),
         },
       );
-    res.json(teacher);
+    res.json(classroom);
   } catch (error) {
     next(error);
   }

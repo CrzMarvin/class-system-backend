@@ -2,6 +2,7 @@ const express = require('express');
 
 // const queries = require('./users.queries');
 const Icon = require('./icons.model');
+const { checkIdIsNumber } = require('../../lib/queryUtils');
 
 const router = express.Router();
 
@@ -25,6 +26,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
+    checkIdIsNumber(req.params.id, res);
     const icon = await Icon.query()
       .where('deleted_at', null)
       .select('id', 'name', 'type', 'base_url', 'resource')
