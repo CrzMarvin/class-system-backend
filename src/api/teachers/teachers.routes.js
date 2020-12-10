@@ -31,7 +31,8 @@ router.get('/', async (req, res) => {
   const teachers = await Teacher
     .query()
     .where('teacher.deleted_at', null)
-    .join('icon', 'teacher.id', 'icon.id')
+    .leftJoin('icon', 'teacher.icon_id', 'icon.id')
+    .orderBy('teacher.id')
     .select(
       'teacher.id',
       'teacher.name',
@@ -70,19 +71,47 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     [
-      'street_address_1',
-      'street_address_2',
-      'city',
-      'zipcode',
+      'gender',
     ].forEach((prop) => {
       if (req.body[prop]) {
-        req.body[prop] = req.body[prop].toString().toLowerCase().trim();
+        req.body[prop] = req.body[prop].toString().toUpperCase().trim();
       }
     });
     const address = await Teacher
       .query()
       .insert(req.body);
     res.json(address);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const { icon_id } = req.body;
+    if (icon_id !== undefined) {
+      const icon = await Icon.query().findById(icon_id);
+      if (!icon) {
+        res.status(400);
+        throw new Error('invalid icon id');
+      }
+    }
+    const item = await Teacher.query().patchAndFetchById(
+      req.params.id,
+      req.body,
+    );
+    res.json(item);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const teacher = await Teacher.query()
+      .deleteById(id);
+    res.json(teacher);
   } catch (error) {
     next(error);
   }
