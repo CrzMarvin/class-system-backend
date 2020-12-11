@@ -19,11 +19,11 @@ class ClassType extends Model {
   static get relationMappings() {
     return {
       audience_info: {
-        relation: Model.HasManyRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Audience,
         join: {
           from: `${tableNames.audience}.id`,
-          to: `${tableNames.class_type}.icon_id`,
+          to: `${tableNames.class_type}.audience_id`,
         },
       },
     };

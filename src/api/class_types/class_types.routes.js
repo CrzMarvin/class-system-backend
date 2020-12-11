@@ -11,16 +11,15 @@ router.get('/', async (req, res) => {
   const classTypes = await ClassType
     .query()
     .where('class_type.deleted_at', null)
-    .leftJoin('audience', 'class_type.audience_id', 'audience.id')
-    .orderBy('class_type.id')
     .select(
-      'class_type.id',
-      'class_type.name',
-      'class_type.color',
-      'class_type.duration',
+      'id',
+      'name',
+      'color',
+      'duration',
+      'duration',
       'audience_id',
-      'audience.name as audience_name',
-    );
+    )
+    .withGraphFetched('audience_info(getInfo)');
   res.json(classTypes);
 });
 
@@ -30,15 +29,16 @@ router.get('/:id', async (req, res, next) => {
     const class_type = await ClassType.query()
       .where('class_type.deleted_at', null)
       .andWhere('class_type.id', req.params.id)
-      .leftJoin('audience', 'class_type.audience_id', 'audience.id')
+      .limit(1)
       .select(
-        'class_type.id',
-        'class_type.name',
-        'class_type.color',
-        'class_type.duration',
+        'id',
+        'name',
+        'color',
+        'duration',
+        'duration',
         'audience_id',
-        'audience.name as audience_name',
       )
+      .withGraphFetched('audience_info(getInfo)')
       .first();
     if (!class_type) {
       res.status(404);

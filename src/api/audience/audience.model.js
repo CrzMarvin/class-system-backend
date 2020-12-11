@@ -2,7 +2,7 @@ const { Model } = require('objection');
 const tableNames = require('../../constants/tableNames');
 const schema = require('./audience.schema.json');
 
-class Icon extends Model {
+class Audience extends Model {
   static get tableName() {
     return tableNames.audience;
   }
@@ -10,6 +10,14 @@ class Icon extends Model {
   static get jsonSchema() {
     return schema;
   }
+
+  static get modifiers() {
+    return {
+      getInfo(builder) {
+        builder.select('name', 'location');
+      },
+    };
+  }
 }
 
-module.exports = Icon;
+module.exports = Audience;
