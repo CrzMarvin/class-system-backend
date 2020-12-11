@@ -1,11 +1,11 @@
 const { Model } = require('objection');
 const tableNames = require('../../constants/tableNames');
-const schema = require('./class_types.schema.json');
-const Audience = require('../audience/audience.model');
+const schema = require('./courses.schema.json');
+const ClassType = require('../class_types/class_types.model');
 
-class ClassType extends Model {
+class Course extends Model {
   static get tableName() {
-    return tableNames.class_type;
+    return tableNames.course;
   }
 
   static get jsonSchema() {
@@ -18,11 +18,11 @@ class ClassType extends Model {
 
   static get relationMappings() {
     return {
-      audience_info: {
+      info: {
         relation: Model.HasManyRelation,
-        modelClass: Audience,
+        modelClass: ClassType,
         join: {
-          from: `${tableNames.audience}.id`,
+          from: `${tableNames.course}.id`,
           to: `${tableNames.class_type}.icon_id`,
         },
       },
@@ -30,4 +30,4 @@ class ClassType extends Model {
   }
 }
 
-module.exports = ClassType;
+module.exports = Course;

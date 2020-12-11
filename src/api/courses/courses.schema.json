@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "title": "Course",
+    "description": "The Course",
+    "required": [
+        "info_id",
+        "teacher_id",
+        "classroom_id",
+        "weekday_index",
+        "start_time",
+        "end_time"
+    ],
+    "additionalProperties": true,
+    "properties": {
+        "id": {
+            "$id": "#/properties/id",
+            "type": "integer",
+            "title": "The database ID of the course."
+        },
+        "info_id": {
+            "$id": "#/properties/info_id",
+            "type": "integer",
+            "title": "The id of the course type."
+        },
+        "teacher_id": {
+            "$id": "#/properties/teacher_id",
+            "type": "number",
+            "title": "The id of the teacher."
+        },
+        "classroom_id": {
+            "$id": "#/properties/classroom_id",
+            "type": "number",
+            "title": "The id of the classroom."
+        },
+        "weekday_index": {
+            "$id": "#/properties/weekday_index",
+            "type": "number",
+            "title": "The id of the weekday 0 for Monday, 6 for Sunday."
+        },
+        "start_time": {
+            "$id": "#/properties/start_time",
+            "type": "string",
+            "title": "The start_time of course."
+        },
+        "end_time": {
+            "$id": "#/properties/end_time",
+            "type": "string",
+            "title": "The start_time of course."
+        }
+    }
+}

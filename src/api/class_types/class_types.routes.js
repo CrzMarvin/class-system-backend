@@ -1,5 +1,4 @@
 const express = require('express');
-const { raw } = require('objection');
 
 // const queries = require('./users.queries');
 const ClassType = require('./class_types.model');
@@ -20,7 +19,7 @@ router.get('/', async (req, res) => {
       'class_type.color',
       'class_type.duration',
       'audience_id',
-      raw('audience.name').as('audience_name'),
+      'audience.name as audience_name',
     );
   res.json(classTypes);
 });
@@ -38,7 +37,7 @@ router.get('/:id', async (req, res, next) => {
         'class_type.color',
         'class_type.duration',
         'audience_id',
-        raw('audience.name').as('audience_name'),
+        'audience.name as audience_name',
       )
       .first();
     if (!class_type) {

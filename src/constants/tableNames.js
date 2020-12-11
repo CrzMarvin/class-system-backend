@@ -5,5 +5,5 @@ module.exports = {
   icon: 'icon',
   classroom: 'classroom',
   class_type: 'class_type',
-  class: 'class',
+  course: 'course',
 };

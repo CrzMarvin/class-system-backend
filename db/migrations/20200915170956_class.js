@@ -13,7 +13,7 @@ const {
  */
 
 exports.up = async (knex) => {
-  await knex.schema.createTable(tableNames.class, (table) => {
+  await knex.schema.createTable(tableNames.course, (table) => {
     table.increments();
     references(table, tableNames.teacher, false);
     references(table, tableNames.classroom, false);
@@ -32,7 +32,7 @@ exports.up = async (knex) => {
 exports.down = async (knex) => {
   await Promise.all(
     [
-      tableNames.class,
+      tableNames.course,
     ]
       .reverse()
       .map((name) => knex.schema.dropTableIfExists(name)),
