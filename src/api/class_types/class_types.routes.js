@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const classTypes = await ClassType
     .query()
-    .where('class_type.deleted_at', null)
+    .where('deleted_at', null)
     .select(
       'id',
       'name',

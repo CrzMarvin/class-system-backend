@@ -28,6 +28,14 @@ class ClassType extends Model {
       },
     };
   }
+
+  static get modifiers() {
+    return {
+      getType(builder) {
+        builder.select('id', 'name', 'color', 'duration');
+      },
+    };
+  }
 }
 
 module.exports = ClassType;

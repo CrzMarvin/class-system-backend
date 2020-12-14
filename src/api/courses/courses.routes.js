@@ -2,24 +2,25 @@ const express = require('express');
 const { raw } = require('objection');
 
 // const queries = require('./users.queries');
-const Classroom = require('./classrooms.model');
+const Course = require('./courses.model');
 const Icon = require('../icons/icons.model');
 const Audience = require('../audience/audience.model');
 const { checkIdIsNumber } = require('../../lib/queryUtils');
-
+const tableNames = require("../../constants/tableNames");
+const { limit } = require('../db');
 const router = express.Router();
 
 // const subQ = Icon.select('base_url', 'resource');
 
 // router.get('/', async (req, res) => {
-//   const classrooms = await Classroom
+//   const courses = await Course
 //     .query()
 //     .where('deleted_at', null)
 //     .select([
-//       'classroom.id',
-//       'classroom.name',
-//       'classroom.icon_id',
-//       'classroom.star',
+//       'course.id',
+//       'course.name',
+//       'course.icon_id',
+//       'course.star',
 //       Icon.query()
 //         .where('icon_id', ref('icon.id'))
 //         .select(raw('concat(base_url, resource)').as('url'))
@@ -27,58 +28,77 @@ const router = express.Router();
 //         .as('petCount'),
 //     ]);
 //     // .withGraphFetched('icon_info').select(1);
-//   res.json(classrooms);
+//   res.json(courses);
 // });
 router.get('/', async (req, res) => {
-  const classrooms = await Classroom
+  const courses = await Course
     .query()
-    .where('classroom.deleted_at', null)
-    .leftJoin('icon', 'classroom.icon_id', 'icon.id')
-    .leftJoin('audience', 'classroom.audience_id', 'audience.id')
-    .orderBy('classroom.id')
+    .where('course.deleted_at', null)
+    .leftJoin('classroom', 'course.classroom_id', 'classroom.id')
+    .orderBy('course.id')
     .select(
-      'classroom.id',
-      'classroom.name',
-      'icon_id',
-      'audience_id',
-      raw('concat(base_url, resource)').as('icon_url'),
-      raw('audience.name').as('audience_name'),
+      'course.id',
+      'teacher_id',
+      'classroom_id',
+      'classroom.name as classroomName',
+      'classroom.icon_id as classroomIconId',
+      'classroom.audience_id',
+      'type_id',
+      'weekday_index',
+      'start_time',
+      'end_time',
     );
-  res.json(classrooms);
+  res.json(courses);
 });
 
 router.get('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const classroom = await Classroom.query()
-      .where('classroom.deleted_at', null)
-      .andWhere('classroom.id', req.params.id)
-      .leftJoin('icon', 'classroom.icon_id', 'icon.id')
-      .leftJoin('audience', 'classroom.audience_id', 'audience.id')
+    const course = await Course
+      .query()
+      .where('deleted_at', null)
+      .andWhere('id', req.params.id)
+      .limit(1)
       .select(
-        'classroom.id',
-        'classroom.name',
-        'icon_id',
-        'audience_id',
-        raw('concat(base_url, resource)').as('icon_url'),
-        raw('audience.name').as('audience_name'),
+        'id',
+        'weekday_index',
+        'start_time',
+        'end_time',
       )
+      .withGraphFetched('class_type(getType)')
+      // .withGraphFetched('teacher(getInfo).[icon_info.[base_url, resource]]')
+      .withGraphFetched({
+        teacher: {
+          $modify: ['getInfo'],
+          icon_info: {
+            $modify: ['getIcon'],
+          },
+        },
+      })
+      .withGraphFetched({
+        classroom: {
+          $modify: ['getInfo'],
+          icon_info: {
+            $modify: ['getIcon'],
+          },
+        },
+      })
       .first();
-    if (!classroom) {
+    if (!course) {
       res.status(404);
       throw new Error('no content');
     }
-    res.json(classroom);
+    res.json(course);
   } catch (error) {
     next(error);
   }
 });
 router.post('/', async (req, res, next) => {
   try {
-    const classroom = await Classroom
+    const course = await Course
       .query()
       .insert(req.body);
-    res.json(classroom);
+    res.json(course);
   } catch (error) {
     next(error);
   }
@@ -102,18 +122,18 @@ router.patch('/:id', async (req, res, next) => {
         throw new Error('invalid audience id');
       }
     }
-    const classroom = await Classroom.query().patchAndFetchById(
+    const course = await Course.query().patchAndFetchById(
       req.params.id,
       {
         ...req.body,
         updated_at: new Date().toISOString(),
       },
     );
-    if (!classroom) {
+    if (!course) {
       res.status(404);
       throw new Error('no content');
     }
-    res.json(classroom);
+    res.json(course);
   } catch (error) {
     next(error);
   }
@@ -122,14 +142,14 @@ router.patch('/:id', async (req, res, next) => {
 router.delete('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const classroom = await Classroom.query()
+    const course = await Course.query()
       .patchAndFetchById(
         req.params.id,
         {
           deleted_at: new Date().toISOString(),
         },
       );
-    res.json(classroom);
+    res.json(course);
   } catch (error) {
     next(error);
   }

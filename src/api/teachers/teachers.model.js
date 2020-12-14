@@ -19,12 +19,20 @@ class Teacher extends Model {
   static get relationMappings() {
     return {
       icon_info: {
-        relation: Model.HasManyRelation,
+        relation: Model.BelongsToOneRelation,
         modelClass: Icon,
         join: {
           from: `${tableNames.icon}.id`,
           to: `${tableNames.teacher}.icon_id`,
         },
+      },
+    };
+  }
+
+  static get modifiers() {
+    return {
+      getInfo(builder) {
+        builder.select('id', 'name', 'star');
       },
     };
   }

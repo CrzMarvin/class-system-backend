@@ -6,7 +6,7 @@ const users = require('./users/users.routes');
 const teachers = require('./teachers/teachers.routes');
 const classrooms = require('./classrooms/classrooms.routes');
 const class_types = require('./class_types/class_types.routes');
-// const classes = require('./classes/classes.routes');
+const courses = require('./courses/courses.routes');
 const project = require('../constants/project');
 // const { authenticateJWT } = require('../lib/jwt');
 
@@ -26,6 +26,6 @@ router.use('/teachers', teachers);
 router.use('/classrooms', classrooms);
 // router.use('/classrooms', authenticateJWT, classrooms);
 router.use('/class_types', class_types);
-// router.use('/classes', classes);
+router.use('/courses', courses);
 
 module.exports = router;

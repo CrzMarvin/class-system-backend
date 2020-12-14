@@ -16,6 +16,9 @@ class Audience extends Model {
       getInfo(builder) {
         builder.select('name', 'location');
       },
+      getAudienceName(builder) {
+        builder.select('name as audience_Name');
+      },
     };
   }
 }

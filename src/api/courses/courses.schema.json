@@ -4,7 +4,7 @@
     "title": "Course",
     "description": "The Course",
     "required": [
-        "info_id",
+        "type_id",
         "teacher_id",
         "classroom_id",
         "weekday_index",
@@ -18,8 +18,8 @@
             "type": "integer",
             "title": "The database ID of the course."
         },
-        "info_id": {
-            "$id": "#/properties/info_id",
+        "type_id": {
+            "$id": "#/properties/type_id",
             "type": "integer",
             "title": "The id of the course type."
         },

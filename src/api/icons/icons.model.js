@@ -1,4 +1,4 @@
-const { Model } = require('objection');
+const { Model, raw } = require('objection');
 const tableNames = require('../../constants/tableNames');
 const schema = require('./icons.schema.json');
 
@@ -13,6 +13,22 @@ class Icon extends Model {
 
   url() {
     return `${this.base_url}${this.resource}`;
+  }
+
+  static get modifiers() {
+    return {
+      getUrl(builder) {
+        builder.select('concat(base_url, resource) as icon_url');
+      },
+      getIcon(builder) {
+        builder.select(
+          'id',
+          'name',
+          'type',
+          raw('concat(base_url, resource)').as('url'),
+        );
+      },
+    };
   }
 }
 

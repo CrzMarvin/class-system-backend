@@ -17,7 +17,7 @@ exports.up = async (knex) => {
     table.increments();
     references(table, tableNames.teacher, false);
     references(table, tableNames.classroom, false);
-    references(table, tableNames.class_type, false, 'info');
+    references(table, tableNames.class_type, false, 'type');
     table.integer('weekday_index');
     table.string('start_time');
     table.string('end_time');
