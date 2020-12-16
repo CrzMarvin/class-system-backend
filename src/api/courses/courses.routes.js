@@ -1,35 +1,13 @@
 const express = require('express');
-const { raw } = require('objection');
 
-// const queries = require('./users.queries');
 const Course = require('./courses.model');
-const Icon = require('../icons/icons.model');
-const Audience = require('../audience/audience.model');
+const Teacher = require('../teachers/teachers.model');
+const Classroom = require('../classrooms/classrooms.model');
+const ClassType = require('../class_types/class_types.model');
 const { checkIdIsNumber } = require('../../lib/queryUtils');
-const tableNames = require("../../constants/tableNames");
-const { limit } = require('../db');
+
 const router = express.Router();
 
-// const subQ = Icon.select('base_url', 'resource');
-
-// router.get('/', async (req, res) => {
-//   const courses = await Course
-//     .query()
-//     .where('deleted_at', null)
-//     .select([
-//       'course.id',
-//       'course.name',
-//       'course.icon_id',
-//       'course.star',
-//       Icon.query()
-//         .where('icon_id', ref('icon.id'))
-//         .select(raw('concat(base_url, resource)').as('url'))
-//         .first()
-//         .as('petCount'),
-//     ]);
-//     // .withGraphFetched('icon_info').select(1);
-//   res.json(courses);
-// });
 router.get('/', async (req, res) => {
   const courses = await Course
     .query()
@@ -66,7 +44,6 @@ router.get('/:id', async (req, res, next) => {
         'end_time',
       )
       .withGraphFetched('class_type(getType)')
-      // .withGraphFetched('teacher(getInfo).[icon_info.[base_url, resource]]')
       .withGraphFetched({
         teacher: {
           $modify: ['getInfo'],
@@ -107,19 +84,26 @@ router.post('/', async (req, res, next) => {
 router.patch('/:id', async (req, res, next) => {
   try {
     checkIdIsNumber(req.params.id, res);
-    const { icon_id, audience_id } = req.body;
-    if (icon_id !== undefined) {
-      const icon = await Icon.query().findById(icon_id);
-      if (!icon) {
+    const { teacher_id, classroom_id, type_id } = req.body;
+    if (teacher_id !== undefined) {
+      const teacher = await Teacher.query().findById(teacher_id);
+      if (!teacher) {
         res.status(400);
-        throw new Error('invalid icon id');
+        throw new Error('invalid teacher id');
       }
     }
-    if (audience_id !== undefined) {
-      const audience = await Audience.query().findById(audience_id);
-      if (!audience) {
+    if (classroom_id !== undefined) {
+      const classroom = await Classroom.query().findById(classroom_id);
+      if (!classroom) {
         res.status(400);
-        throw new Error('invalid audience id');
+        throw new Error('invalid classroom id');
+      }
+    }
+    if (type_id !== undefined) {
+      const classType = await ClassType.query().findById(type_id);
+      if (!classType) {
+        res.status(400);
+        throw new Error('invalid classType id');
       }
     }
     const course = await Course.query().patchAndFetchById(
