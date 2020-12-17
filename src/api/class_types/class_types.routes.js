@@ -19,6 +19,7 @@ router.get('/', async (req, res) => {
       'duration',
       'audience_id',
     )
+    .orderBy('id')
     .withGraphFetched('audience_info(getInfo)');
   res.json(classTypes);
 });

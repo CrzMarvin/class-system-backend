@@ -16,6 +16,7 @@ router.get('/', async (req, res, next) => {
     const icons = await Icon
       .query()
       .select('id', 'name', 'type', 'base_url', 'resource')
+      .orderBy('id')
       .where('deleted_at', null);
     const iconsWithUrl = icons.map(addURL);
     res.json(iconsWithUrl);
